@@ -60,6 +60,8 @@ the first line is required::
 
     UPLOAD_DIR = "/tmp/flightdeck"
 
+    SESSION_COOKIE_SECURE = False
+
 If this is a brand new installation you'll need to configure a database as
 well.  This command will build the structure::
 

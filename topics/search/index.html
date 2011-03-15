@@ -1,0 +1,150 @@
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Elastic Search &mdash; Add-on Builder v1.0a5 documentation</title>
+    <link rel="stylesheet" href="../../_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../',
+        VERSION:     '1.0a5',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../_static/doctools.js"></script>
+    <link rel="top" title="Add-on Builder v1.0a5 documentation" href="../../" />
+    <link rel="prev" title="Typical git commands used by developer" href="../../development/developer_commands/" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex/" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../development/developer_commands/" title="Typical git commands used by developer"
+             accesskey="P">previous</a> |</li>
+        <li><a href="../../">Add-on Builder v1.0a5 documentation</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="elastic-search">
+<span id="elasticsearch"></span><h1>Elastic Search<a class="headerlink" href="#elastic-search" title="Permalink to this headline">¶</a></h1>
+<p><a class="reference external" href="http://elasticsearch.org/">ElasticSearch</a>  is a Lucene based search engine
+that powers FlightDeck search. We also use <tt class="docutils literal"><span class="pre">pyes</span></tt> (<a class="reference external" href="https://github.com/aparo/pyes">link</a>) a pythonic interface to
+ElasticSearch.</p>
+<div class="section" id="running-elasticsearch">
+<h2>Running ElasticSearch<a class="headerlink" href="#running-elasticsearch" title="Permalink to this headline">¶</a></h2>
+<p>FlightDeck was developed with ElasticSearch 14.4 so we recommend downloading
+that and running it.  You will need to point it at a config file that we&#8217;ve
+included in <tt class="docutils literal"><span class="pre">scripts/es/es.yml</span></tt>:</p>
+<div class="highlight-python"><pre>elasticsearch -f -Des.config=$ROOT/scripts/es/es.yml</pre>
+</div>
+<p>Where <tt class="docutils literal"><span class="pre">$ROOT</span></tt> is your FlightDeck home.</p>
+</div>
+<div class="section" id="configuration">
+<h2>Configuration<a class="headerlink" href="#configuration" title="Permalink to this headline">¶</a></h2>
+<p>This configuraion can be overridden if necessary.  FlightDeck by default uses
+port 9201 and 9301.  More details are <a class="reference external" href="http://www.elasticsearch.org/guide/reference/setup/configuration.html">here</a>.</p>
+</div>
+<div class="section" id="development">
+<h2>Development<a class="headerlink" href="#development" title="Permalink to this headline">¶</a></h2>
+<p><tt class="docutils literal"><span class="pre">settings.py</span></tt> needs to be overridden in order to use ElasticSearch.  Both
+<tt class="docutils literal"><span class="pre">ES_DISABLED</span></tt> needs to be <tt class="xref docutils literal"><span class="pre">False</span></tt> and <tt class="docutils literal"><span class="pre">ES_HOSTS</span></tt> needs to be set.  This
+can be done in <tt class="docutils literal"><span class="pre">settings_local.py</span></tt>.</p>
+</div>
+<div class="section" id="testing">
+<h2>Testing<a class="headerlink" href="#testing" title="Permalink to this headline">¶</a></h2>
+<p>In order for testing to work <tt class="docutils literal"><span class="pre">ES_HOSTS</span></tt> needs to be defined (otherwise
+SkipTest will be raised) and ElasticSearch needs to be running.  We
+specifically look at a single index, <tt class="docutils literal"><span class="pre">test_flightdeck</span></tt>, in order to avoid
+conflicts with development data.</p>
+</div>
+<div class="section" id="todo">
+<h2>Todo<a class="headerlink" href="#todo" title="Permalink to this headline">¶</a></h2>
+<p>In the future we may need to:</p>
+<ul class="simple">
+<li>Add items and remove items asynchronously using Celery.</li>
+<li>Build a frontend for search.</li>
+<li>Add custom mapping.</li>
+</ul>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="../../">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Elastic Search</a><ul>
+<li><a class="reference internal" href="#running-elasticsearch">Running ElasticSearch</a></li>
+<li><a class="reference internal" href="#configuration">Configuration</a></li>
+<li><a class="reference internal" href="#development">Development</a></li>
+<li><a class="reference internal" href="#testing">Testing</a></li>
+<li><a class="reference internal" href="#todo">Todo</a></li>
+</ul>
+</li>
+</ul>
+
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="../../development/developer_commands/"
+                        title="previous chapter">Typical git commands used by developer</a></p>
+  <h3>This Page</h3>
+  <ul class="this-page-menu">
+    <li><a href="../../_sources/topics/search.txt"
+           rel="nofollow">Show Source</a></li>
+  </ul>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="../../search/" method="get">
+      <input type="text" name="q" size="18" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex/" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../../development/developer_commands/" title="Typical git commands used by developer"
+             >previous</a> |</li>
+        <li><a href="../../">Add-on Builder v1.0a5 documentation</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2010, Mozilla.
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.0.7.
+    </div>
+  </body>
+</html>

@@ -21,6 +21,12 @@ Contents:
    installation.rst
    development/index.rst
 
+.. toctree::
+   :maxdepth: 1
+   :glob:
+
+   topics/*
+
 Indices and tables
 ==================
 

@@ -3,4 +3,4 @@
 Code Workflow Diagram
 =====================
 
-.. image:: ../../_static/workflow.png
+.. image:: ../../../_static/workflow.png

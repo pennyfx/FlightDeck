@@ -7,9 +7,6 @@ Content
 
 .. toctree::
    :maxdepth: 2
+   :glob:
 
-   update.rst
-   code_workflow.rst
-   developer_commands.rst
-   .. manager_commands.rst
-
+   *
