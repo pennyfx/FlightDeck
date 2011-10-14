@@ -1775,6 +1775,16 @@ class Package(BaseModel, SearchMixin):
         revision.set_version(manifest['version'])
         return revision
 
+    def get_current_modules(self):
+        
+        ms = Module.objects.raw("""SELECT m.* FROM jetpack_module_revisions r
+                JOIN jetpack_module m ON m.id = r.module_id
+                JOIN jetpack_packagerevision pr ON pr.id = r.packagerevision_id
+                JOIN jetpack_package p ON p.id = pr.package_id
+                WHERE p.id = {0} AND p.latest_id = pr.id""".format(self.id))
+        
+        return ms
+        
     def clean(self):
         self.full_name = alphanum_plus(self.full_name)
         if self.description:
@@ -1837,6 +1847,8 @@ class Package(BaseModel, SearchMixin):
             .exclude(package=self)
             .values_list('package_id', flat=True)))
         data['copies_count'] = len(data['copies'])
+        
+        data['modules'] = [{ 'file': m.filename, 'code': m.code} for m in self.get_current_modules()]
         
         log.debug(data)
         
