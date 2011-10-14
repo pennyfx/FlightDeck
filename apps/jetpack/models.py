@@ -1776,7 +1776,9 @@ class Package(BaseModel, SearchMixin):
         return revision
 
     def get_current_modules(self):
-        
+        """ Returns all the js modules for the current version of the
+            package
+        """
         ms = Module.objects.raw("""SELECT m.* FROM jetpack_module_revisions r
                 JOIN jetpack_module m ON m.id = r.module_id
                 JOIN jetpack_packagerevision pr ON pr.id = r.packagerevision_id
