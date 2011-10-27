@@ -111,7 +111,7 @@ def search(request):
     
     ctx.update(results)
     ctx.update(facets)
-    print "\r\n\r\ntemplate:{0}\r\n\r\n".format(template)
+    
     if request.is_ajax():
         template = 'ajax/' + template
     return _render(request, template, ctx)
