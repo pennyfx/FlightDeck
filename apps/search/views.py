@@ -7,6 +7,7 @@ from django.template import RequestContext
 from jetpack.models import Package
 from .helpers import package_search, get_activity_scale
 from .forms import SearchForm
+from pyes.urllib3.connectionpool import TimeoutError
 
 log = commonware.log.getLogger('f.search')
 
@@ -50,35 +51,56 @@ def search(request):
 
     if query.get('activity'):
         filters['activity__gte'] = activity_map.get(str(query['activity']), 0)
-  
-    results = {}
-    facets = {}
-   
+         
     copies_facet = {'terms': {'field': 'copies_count'}}
     times_depended_facet = {'terms': {'field': 'times_depended'}}
     facets_ = {'copies': copies_facet, 'times_depended': times_depended_facet}
-    if type_:
-        filters['type'] = type_        
-        qs = package_search(q, **filters).order_by(sort).facet(**facets_)
-        try:
-            results['pager'] = Paginator(qs, per_page=limit).page(page)
-        except EmptyPage:
-            results['pager'] = Paginator(qs, per_page=limit).page(1)
-        facets = _facets(results['pager'].object_list.facets)
-        facets['everyone_total'] = len(qs)
-        template = 'results.html'
-    else:
-        # combined view
-        results['addons'] = package_search(q, type='a', **filters).order_by(sort).facet(
-                **facets_)[:5]
-        results['libraries'] = package_search(q, type='l', **filters).order_by(sort).facet(
-                **facets_)[:5]
-        facets = _facets(results['addons'].facets)
-        facets['everyone_total'] = facets['combined_total']
-        template = 'aggregate.html'
-
-
-
+    
+    def retry_on_timeout(fn ,args, max_retry=1):
+        tries = 0;
+        while True:
+            try:
+                tries += 1
+                return fn(*args)                
+            except TimeoutError as e:
+                log.error("ES query({3}) timeout: '{0}' - {1} - {2}"
+                        .format(form.cleaned_data,
+                            "retrying" if tries<max_retry else 'forget it',
+                            e, tries
+                        ))
+                if tries==max_retry:
+                    raise e
+                continue
+    
+    def execute_search(type_, q, limit, page, filters, facets_):
+        template = ''
+        results={}
+        facets={}
+        
+        if type_:
+            filters['type'] = type_        
+            qs = package_search(q, **filters).order_by(sort).facet(**facets_)                
+            try:
+                results['pager'] = Paginator(qs, per_page=limit).page(page)
+            except EmptyPage:
+                results['pager'] = Paginator(qs, per_page=limit).page(1)
+            facets = _facets(results['pager'].object_list.facets)
+            facets['everyone_total'] = len(qs)
+            template = 'results.html'
+        else:
+            # combined view
+            results['addons'] = package_search(q, type='a', **filters) \
+                .order_by(sort).facet(**facets_)[:5]
+            results['libraries'] = package_search(q, type='l', **filters) \
+                .order_by(sort).facet(**facets_)[:5] 
+            facets = _facets(results['addons'].facets)
+            facets['everyone_total'] = facets['combined_total']
+            template = 'aggregate.html'
+        return template,results,facets
+    
+    template, results, facets = retry_on_timeout(execute_search,
+                                    [type_,q,limit,page,filters,facets_] , 2)
+    
     ctx = {
         'q': q,
         'page': 'search',
@@ -86,12 +108,10 @@ def search(request):
         'query': query,
         'type': types.get(type_, None)
     }
+    
     ctx.update(results)
     ctx.update(facets)
-
-    for p in results['addons']:
-        log.debug(p.__dict__)
-
+    print "\r\n\r\ntemplate:{0}\r\n\r\n".format(template)
     if request.is_ajax():
         template = 'ajax/' + template
     return _render(request, template, ctx)
