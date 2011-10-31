@@ -164,6 +164,9 @@ AMOAPI_PROTOCOL = "https"
 AMOAPI_DOMAIN = "services.addons.mozilla.org"
 AMOAPI_PORT = 443
 
+AMO_SITE_PROTOCOL = 'https'
+AMO_SITE_DOMAIN = 'addons.mozilla.org'
+
 URLOPEN_TIMEOUT = 4  # default timeout for urllib2.urlopen (seconds)
 
 # set it in settings_local.py if AMO auth should be used

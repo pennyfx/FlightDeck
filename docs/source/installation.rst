@@ -50,8 +50,8 @@ the first line is required::
     DATABASES = {
         'default': {
             'ENGINE': 'django.db.backends.mysql',
-            'NAME': '',
-            'USER': '',
+            'NAME': 'flightdeck',
+            'USER': 'root',
             'PASSWORD': '',
             'HOST': '',
             'OPTIONS': {
@@ -74,28 +74,64 @@ the first line is required::
     CACHES['default']['BACKEND'] =
     'django.core.cache.backends.locmem.LocMemCache'
 
+Make sure that MySQL is running, then create the database you specified
+in settings_local.py::
+
+    mysql -u root -p
+
+    [MySQL messages snipped]
+
+    mysql> CREATE DATABASE flightdeck;
+    Query OK, 1 row affected (0.00 sec)
+
 If this is a brand new installation you'll need to configure a database as
 well.  This command will build the structure::
 
     ./manage.py syncdb
     
-If you're using Elastic Search locally then be sure to setup the ES index
-mappings and index all your packages
+If you're using Elastic Search locally (this is not necessary for basic functionality)
+then be sure to setup the ES index mappings and index all your packages::
 
     ./manage.py cron setup_mapping
     ./manage.py cron index_all
 
-FlightDeck needs to know about all the SDKs you have availalbe.  This command
-will make it look for them and initialize the database::
+FlightDeck needs to know about the SDKs you have available (in ./lib).  This command
+will make a single version of the SDK available in FlightDeck's Libraries selector::
 
-    ./manage.py add_core_lib jetpack-sdk-0.8
+    ./manage.py add_core_lib addon-sdk-1.2.1
 
 If you're writing code and would like to add some test data to the database
 you can load some fixtures::
 
     ./manage.py loaddata users packages
 
+Run the development server::
+
+    ./manage.py runserver
+
+In Firefox's about:config create a new string preference named 
+extensions.addonBuilderHelper.trustedOrigins with the value
+``https://builder.addons.mozilla.org/,http://127.0.0.1:8000/``;
+install the Add-on Builder Helper (if you had it already installed, 
+restart the browser after changing the preference)
+
+Navigate the browser to http://127.0.0.1:8000/, log in with the username
+and password you entered while running ``./manage.py syncdb``.
+
 You're all done!
+
+Building documentation
+------------
+
+FlightDeck uses `Sphinx <http://sphinx.pocoo.org/contents.html>`_-based documentation,
+so you have to install sphinx in order to build the docs::
+
+    pip install sphinx
+    make -C docs html
+
+.. note::
+    If you get ``ValueError: unknown locale: UTF-8``, run ``export LC_ALL=en_US.UTF-8``
+    before ``make``.
 
 Using Apache
 ------------

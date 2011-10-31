@@ -1547,7 +1547,7 @@ class Package(BaseModel, SearchMixin):
         if not self.amo_slug:
             return ""
         return "%s://%s/en-US/firefox/addon/%s/" % (
-                settings.AMOAPI_PROTOCOL, settings.AMOAPI_DOMAIN,
+                settings.AMO_SITE_PROTOCOL, settings.AMO_SITE_DOMAIN,
                 self.amo_slug)
 
     def get_edit_on_amo_url(self, step=5):
@@ -1555,7 +1555,7 @@ class Package(BaseModel, SearchMixin):
         if not self.amo_slug:
             return ""
         return "%s://%s/en-US/firefox/developers/addon/%s/submit/%d" % (
-                settings.AMOAPI_PROTOCOL, settings.AMOAPI_DOMAIN,
+                settings.AMO_SITE_PROTOCOL, settings.AMO_SITE_DOMAIN,
                 self.amo_slug, step)
 
     def is_addon(self):
