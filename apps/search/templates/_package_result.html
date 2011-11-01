@@ -4,11 +4,5 @@
         <a href="{{ package.get_absolute_url }}">{{ package.full_name }}</a>
         <span>by <a href="{% url person_public_profile package.author.username %}">{{ package.author.get_profile }}</a></span>
     </h3>
-    <p class="description">{{ package.description }}</p>
-    <ul class="UI_Actions">
-        <li class="UI_Edit_Version"><a href="{{ package.get_latest_url }}">Source</a></li>
-        {% if package.is_addon %}
-        <li class="UI_Try_in_Browser UI_Item XPI_test"><a href="{{ package.latest.get_test_xpi_url }}" data-jetpackid="{{ package.get_jid }}" data-hashtag="{{ package.latest.get_cache_hashtag }}">Test</a></li>
-        {% endif %}
-    </ul>
+    <p class="description">{{ package.description }}</p>    
 </div>
