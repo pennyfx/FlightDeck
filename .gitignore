@@ -16,3 +16,4 @@ src
 .figleaf
 *.pyc
 docs/_gh-pages
+*.komodoproject
