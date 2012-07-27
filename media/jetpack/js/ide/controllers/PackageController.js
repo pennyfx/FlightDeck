@@ -1451,6 +1451,9 @@ module.exports = new Class({
                 this.data[key] = el.get('value');
             }
         }, this);
+        if (this.options.jid === this.data.jid) {
+          delete this.data.jid;
+        }
         // check if save should be called
         if (this.savenow) {
             return this.save();

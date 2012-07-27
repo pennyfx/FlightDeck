@@ -155,7 +155,7 @@ class PackageRevision(BaseModel):
     sdk = models.ForeignKey('SDK', blank=True, null=True)
 
     #: Extra package.json properties
-    extra_json = models.TextField(blank=True)
+    extra_json = models.TextField(blank=True, default='')
 
     class Meta:
         " PackageRevision ordering and uniqueness "
@@ -769,7 +769,7 @@ class PackageRevision(BaseModel):
         raises JSONDecodeError
         """
         self.add_commit_message('Extra JSON properties changed')
-        cleaned_json = None
+        cleaned_json = ''
         if extra_json:
             # check for valid JSON, plus clean out filenames
             json = simplejson.loads(extra_json)

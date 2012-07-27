@@ -904,7 +904,6 @@ def save(request, revision_id, type_id=None):
     if extra_json is not None:
         # None means it wasn't submitted. We want to accept blank strings.
         save_revision = True
-        log.debug('extra_json: %s' % extra_json)
         try:
             revision.set_extra_json(extra_json, save=False)
         except JSONDecodeError:
