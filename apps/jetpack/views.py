@@ -543,16 +543,21 @@ def upload_attachment(request, revision_id):
             'You are not the author of this %s' % escape(
                 revision.package.get_type_name()))
 
-    file = request.FILES.get('upload_attachment')
+    f = request.FILES.get('upload_attachment')
     filename = request.META.get('HTTP_X_FILE_NAME')
 
-    if not file:
+    if not f:
         log_msg = 'Path not found: %s, revision: %s.' % (
             filename, revision_id)
         log.error(log_msg)
         return HttpResponseServerError('Path not found.')
 
-    content = file.read()
+    content = f.read()
+    # try to force UTF-8 code, on error continue with original data
+    try:
+        content = unicode(content, 'utf-8')
+    except:
+        pass
 
     try:
         attachment = revision.attachment_create_by_filename(
@@ -730,6 +735,7 @@ def revision_add_attachment(request, pk):
 
 @require_POST
 @login_required
+@transaction.commit_on_success
 def rename_attachment(request, revision_id):
     """
     Rename an attachment in a PackageRevision
@@ -763,7 +769,10 @@ def rename_attachment(request, revision_id):
         )
     attachment.filename = new_name
     attachment.ext = new_ext
-    attachment = revision.update(attachment)
+    try:
+        attachment = revision.update(attachment)
+    except ValidationError, err:
+        return HttpResponseForbidden(str(err))
 
     return render_json(request,
             "json/attachment_renamed.json",
@@ -1049,9 +1058,11 @@ def library_autocomplete(request):
 
     ids = (settings.MINIMUM_PACKAGE_ID, settings.MINIMUM_PACKAGE_ID - 1)
     notAddonKit = ~(F(id_number=ids[0]) | F(id_number=ids[1]))
+    onlyMyPrivateLibs = (F(active=True) | F(author=request.user.id))
+    
     try:
         qs = (Package.search().query(or_=package_query(q)).filter(type='l')
-                .filter(notAddonKit))
+                .filter(notAddonKit).filter(onlyMyPrivateLibs))
         found = qs[:limit]
     except Exception, ex:
         log.exception('Library autocomplete error')

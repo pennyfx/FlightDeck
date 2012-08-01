@@ -1658,7 +1658,7 @@ class Package(BaseModel, SearchMixin):
             try:
                 version = (versions.exclude(version_name='initial')
                                    .exclude(version_name='copy')
-                                   .latest('version_name'))
+                                   .latest('created_at'))
             except PackageRevision.DoesNotExist:
                 try:
                     version = versions.get(version_name='copy')
@@ -2007,7 +2007,7 @@ class Package(BaseModel, SearchMixin):
     @es_required
     def refresh_index(self, es, bulk=False):
         # Don't index private/deleted things, and remove them.
-        if not self.active or self.deleted:
+        if self.deleted:
             return self.remove_from_index(bulk=bulk)
 
         data = djangoutils.get_values(self)
@@ -2030,13 +2030,16 @@ class Package(BaseModel, SearchMixin):
             for m in self.version.modules.all():
                 size += len(m.code)
             data['size'] = size
+        
+        if self.version and self.version.version_name != 'initial':
             data['full_name'] = self.version.full_name
+        else:
+            data['full_name'] = self.latest.full_name
 
         if self.is_library():
             data['times_depended'] = (Package.objects
                     .filter(latest__dependencies__in=self.revisions.all())
                     .count())
-
         try:
 
             retries = getattr(settings, 'ES_RETRY', 0)

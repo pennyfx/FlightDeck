@@ -357,6 +357,16 @@ class TestViews(TestCase):
 
         eq_(resp.status_code, 404)
 
+    def test_attachment_with_utf_upload(self):
+        file_path = os.path.join(settings.ROOT,
+                                  'apps/jetpack/tests/jquery-1.6.4.min.js')
+
+        url = self.get_upload_url(self.revision.revision_number)
+        with open(file_path, 'r') as f:
+            response = self.client.post(url, { 'upload_attachment': f },
+                                    HTTP_X_FILE_NAME='jquery-1.6.4.min.js')
+        eq_(response.status_code, 200)
+
     def test_attachment_rename(self):
         revision = self.add_one()
         old_uid = revision.attachments.all()[0].get_uid
@@ -373,6 +383,19 @@ class TestViews(TestCase):
 
         revision = next_revision(revision)
         eq_(revision.attachments.count(), 1)
+
+        # use a not allowed extension length
+        old_rev_no = revision.package.revisions.count()
+        old_uid = revision.attachments.all()[0].get_uid
+        response = self.client.post(revision.get_rename_attachment_url(), {
+                    'new_filename': 'xxx',
+                    'new_ext': '01234567890987654321',
+                    'uid': old_uid})
+        eq_(response.status_code, 403)
+        # XXX: I've added transaction.on_success to the view, but this is
+        #      still creating a new revision. Check is needed if that is still
+        #      the case on test server.
+        #eq_(old_rev_no, revision.package.revisions.count())
 
     def test_attachment_save(self):
         # back-end responds with
