@@ -17,6 +17,8 @@ from jetpack.models import Package, PackageRevision, Module, Attachment, SDK
 from jetpack.errors import SelfDependencyException, FilenameExistException, \
         DependencyException
 
+from utils import validator
+
 from base.helpers import hashtag
 
 log = commonware.log.getLogger('f.test')
@@ -490,6 +492,9 @@ class PackageRevisionTest(TestCase):
         rev = self.addon.revisions.latest('pk')
         eq_(rev.message, self.addon.latest.message)
 
+    def test_cached_hashtag(self):
+        assert validator.is_valid('alphanum',
+                self.addon.latest.get_cache_hashtag())
 
     """
     Althought not supported on view and front-end,

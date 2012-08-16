@@ -280,7 +280,7 @@ class PackageRevision(BaseModel):
     ###############
 
     def get_cache_hashtag(self):
-        return "revision-%s" % self.pk
+        return "revision%s" % self.pk
 
     # NAME and FULL_NAME in Revision #############
 
@@ -2030,7 +2030,7 @@ class Package(BaseModel, SearchMixin):
             for m in self.version.modules.all():
                 size += len(m.code)
             data['size'] = size
-        
+
         if self.version and self.version.version_name != 'initial':
             data['full_name'] = self.version.full_name
         else:
